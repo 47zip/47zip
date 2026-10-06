@@ -21,7 +21,7 @@ export async function POST(request: Request) {
   if (type === "PAYMENT.CAPTURE.REFUNDED") {
     const { data: pack } = await db.from("download_packages").select("blob_path").eq("order_id", order.id).maybeSingle();
     if (pack) {
-      await del(pack.blob_path, { access: "private" }).catch(() => undefined);
+      await del(pack.blob_path).catch(() => undefined);
       await db.from("download_packages").delete().eq("order_id", order.id);
     }
     await db.from("orders").update({ status: "refunded" }).eq("id", order.id);

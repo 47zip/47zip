@@ -56,7 +56,9 @@ export async function POST(request: Request) {
         if (!saved.success) throw new Error("Carga no asociada a un producto.");
         const max = Number(process.env.MAX_PACKAGE_SOURCE_BYTES ?? 25000000);
         const prefix = "products/" + saved.data.productId + "/";
-        const size = Number(blob.size ?? saved.data.size);
+        // The server-issued upload token contains the validated source size;
+        // HandleUpload's completion blob type does not expose a `size` field.
+        const size = saved.data.size;
         if (!Number.isSafeInteger(max) || max < 1 || size < 1 || size > max ||
             !blob.pathname.startsWith(prefix) ||
             !blob.pathname.toLowerCase().endsWith(extensions[saved.data.format])) {

@@ -98,11 +98,11 @@ export async function fulfillPaidOrder(orderId: string) {
     await zip.close();
     const packageBytes = await writer.getData();
     const path = "packages/" + orderId + "/" + randomBytes(10).toString("hex") + ".zip";
-    await put(path, packageBytes, { access: "private", addRandomSuffix: false, contentType: "application/zip", cacheControlMaxAge: 1 });
+    await put(path, Buffer.from(packageBytes), { access: "private", addRandomSuffix: false, contentType: "application/zip", cacheControlMaxAge: 1 });
     const encrypted = encryptSecret(password);
     const { error: insertError } = await db.from("download_packages").insert({ order_id: orderId, blob_path: path, ...encrypted });
     if (insertError) {
-      await del(path, { access: "private" }).catch(() => undefined);
+      await del(path).catch(() => undefined);
       const { data: winner } = await db.from("download_packages").select("order_id").eq("order_id", orderId).maybeSingle();
       if (!winner) throw insertError;
     }

@@ -15,7 +15,7 @@ export default function AdminMfa() {
     setBusy(true); setMessage("");
     const { data: factors, error: listError } = await client.auth.mfa.listFactors();
     if (listError) { setMessage("No se pudo revisar la configuración MFA."); setBusy(false); return; }
-    const existing = factors.totp.find((item) => item.status === "verified");
+    const existing = factors.totp.find((item: { id: string; status: string }) => item.status === "verified");
     let id = existing?.id ?? "";
     if (!id) {
       const { data, error } = await client.auth.mfa.enroll({ factorType: "totp", friendlyName: "Folio admin" });
